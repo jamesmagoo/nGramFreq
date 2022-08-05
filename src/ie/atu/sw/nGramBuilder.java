@@ -1,5 +1,6 @@
 package ie.atu.sw;
 
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,64 +8,29 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.JFileChooser;
 
 public class nGramBuilder {
 
 	private int size;
 	private String location;
 
+	
 	/**
-	 * Set the file directory
+	 * Set the n-gram input path
 	 * 
-	 * @param null
+	 * @param path of input folder
 	 * @return boolean
 	 *
 	 */
-	public boolean setDirectory() {
-		JFileChooser chooser = new JFileChooser(new java.io.File("."));
-		chooser.setDialogTitle("Select Folder For N-Gram Builder");
-		//chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-		if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-//		      System.out.println("getCurrentDirectory(): " 
-//		         +  chooser.getCurrentDirectory());
-//		      location = chooser.getCurrentDirectory();
-			location = chooser.getSelectedFile().getPath();
-
-			try {
-				FileWriter fw = new FileWriter("out.txt");
-				BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(location))));
-				String line = null;
-				
-				while((line = br.readLine())!= null) {
-					System.out.println(line);
-					fw.write(line + " by Alex Turner" + "\n");
-				}
-				
-				br.close();
-				fw.flush();
-				fw.close();
-				
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			return true;
-		} else {
-			System.out.println("No Selection ");
-			return false;
-			
-			// more testing of github
-		}
-
+	public boolean setInputPath(String path) {
+		location = path;
+		System.out.println(location);
+		return true;
 	}
-
+	
 	/**
 	 * Set the n-gram size for processing
 	 * 
@@ -78,8 +44,67 @@ public class nGramBuilder {
 			return false;
 		} else {
 			size = n;
+			System.out.println("N-Gram Size Set to :" + size);
 			return true;
 		}
 
+	}
+	
+	/**
+	 * Process the files
+	 * 
+	 * @param location , the folder where the files are
+	 * @return boolean
+	 *
+	 */
+	public boolean processNGrams(String location) {
+		
+		System.out.println("Folder path set: " + location);
+			
+		// check that n-gram size and file location has been set
+		try {
+			FileWriter fw = new FileWriter("out.txt");
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File("./tranquility.txt"))));
+			
+			
+			String line = null;
+			
+			while((line = br.readLine())!= null) {
+				// do some business here n-gramming
+				line = line.replaceAll("[^A-Za-z]", "");
+				makeNGrams(line);
+				//fw.write(line + " by Alex Turner zzz" + "\n");
+			}
+			
+			br.close();
+			fw.flush();
+			fw.close();
+			return true;
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Proccessing");
+		
+		return true;
+		
+	}
+	
+	private void makeNGrams(String s) {
+		List<String> ngrams = new ArrayList<String>();
+		
+		System.out.println(s);
+		String x = s.substring(0, 2);
+		System.out.println(x);
+		
+		char[] arr = s.toCharArray();
+		
+		for(int i=0; i<arr.length ; i++) {
+			System.out.print(arr[i] + ",");
+		}
 	}
 }
