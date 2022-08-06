@@ -6,13 +6,11 @@ public class Menu {
 
 	private Scanner s;
 	private boolean keepRunning = true;
-	private String inputPath;
-
 	public Menu() {
 		s = new Scanner(System.in);
 	}
 
-	nGramBuilder builder = new nGramBuilder();
+	Parser p = new Parser() ;
 
 	// Start Menu & Process User Choice
 	public void start() {
@@ -21,20 +19,17 @@ public class Menu {
 			int choice = Integer.parseInt(s.next());
 			if (choice == 1) {
 				// specify text file directory
-				System.out.println("Select Files");
-
-				// Display menu for user to select folder for input
-				showSetDirectory();
-
-				// set folder path for builder
-				if (builder.setInputPath(inputPath) == true) {
-					System.out.println("Success!");
+				System.out.println("Input Folder Path:");
+				// reads an String value
+			    String inputPath = s.next();
+			    
+			    if(inputPath != null ) {
+			    	p.setInputPath(inputPath);
 					System.out.print("Select Option [1-4]>");
 					System.out.println();
-				} else {
-					System.out.println("Error");
-				}
-				;
+			    } else {
+			    	System.out.println("Error");
+			    }				
 
 			} else if (choice == 2) {
 				
@@ -45,7 +40,7 @@ public class Menu {
 			    int nGramSize = s.nextInt();
 
 			    // set n-gram size in Builder class
-			    if(builder.setNGramSize(nGramSize) == true) {
+			    if(p.setNGramSize(nGramSize) == true) {
 			    	System.out.println("Success!");
 					System.out.print("Select Option [1-4]>");
 					System.out.println();
@@ -62,13 +57,15 @@ public class Menu {
 
 			} else if (choice == 4) {
 
-				builder.processNGrams(inputPath);
-//				if (inputPath != null) {
-//
-//				} else {
-//					System.out.println("Ensure you have set input & output locations, using Option 1 & 3");
-//					System.out.print("Select Option [1-4]>");
-//				}
+				try {
+					// main n-gram builder method
+					p.executeNGramBuilder();
+					
+				} catch (Exception e) {
+				
+					e.printStackTrace();
+				}
+
 
 			} else if (choice == 5) {
 				System.out.println("Quit");
@@ -96,28 +93,6 @@ public class Menu {
 		System.out.print("Select Option [1-4]>");
 		System.out.println();
 	}
-
-	/**
-	 * Display GUI for user to set the input directory path
-	 * 
-	 * @param null
-	 * @return void
-	 *
-	 */
-	private void showSetDirectory() {
-		JFileChooser chooser = new JFileChooser(new java.io.File("."));
-		chooser.setDialogTitle("Select Folder For N-Gram Builder");
-		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-		if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-			System.out.println("getCurrentDirectory(): " + chooser.getCurrentDirectory());
-			inputPath = chooser.getSelectedFile().getPath();
-
-		} else {
-			System.out.println("No Selection ");
-		}
-	}
-
 
 
 }
