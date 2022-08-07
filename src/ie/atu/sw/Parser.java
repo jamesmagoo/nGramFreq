@@ -20,7 +20,7 @@ public class Parser {
 	public Parser() {
 		// TODO: Set this using the n-gram size (n) i.e. 26^n is the max amount of rows
 		// needed for an n-gram
-		freqTable = new Object[11100][2];
+		freqTable = new Object[1000][2];
 	}
 	
 	/**
@@ -35,11 +35,21 @@ public class Parser {
 		if((inputDirPath !=null) && (nGramSize != 0)) {
 			// process the directory
 			parseDirectory();
+			printTable();
 		} else {
 			System.out.println("ERROR: Specify N-Gram Size & Input/Output Directory Paths");
 		}
 		
 		
+	}
+	
+	private void printTable() {
+		
+		for(int i = 0; i < freqTable.length ; i++ ) {
+			if(freqTable[i][0] != null) {
+				System.out.println(freqTable[i][0] + "---" + freqTable[i][1]);
+			}
+		}
 	}
 
 	/**
@@ -82,13 +92,13 @@ public class Parser {
 	}
 
 	/**
-	 * Process the files
+	 * Read the files
 	 * 
-	 * @param location , the folder where the files are
-	 * @return boolean
+	 * @param file , the file to be read
+	 * @return void
 	 *
 	 */
-	public void processNGrams(String file) throws Exception {
+	public void readFile(String file) throws Exception {
 
 		// check that n-gram size and file location has been set
 
@@ -101,7 +111,7 @@ public class Parser {
 			while ((line = br.readLine()) != null) {
 
 				// do some business here n-gramming
-				line = line.replaceAll("[^A-Za-z]", "");
+				line = line.replaceAll("[^A-Za-z]", "").toLowerCase();
 				makeNGrams(line);
 				// fw.write(line + " by Alex Turner zzz" + "\n");
 			}
@@ -146,37 +156,44 @@ public class Parser {
 	 *
 	 */
 	public void parseDirectory() {
+		String[] fileList = null;
 		
-		if(inputDirPath != null) {
-			File f = new File(inputDirPath);
-			String[] fileList = f.list();
-			
-
-			for (String file : fileList) {
-				System.out.println(file);
-				// process each file 
-				try {
-					processNGrams(inputDirPath + "/" + file);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			try {
+				File f = new File(inputDirPath);
+				fileList = f.list();
+				for (String file : fileList) {
+					System.out.println(file);
+					// process each file 
+					try {
+						readFile(inputDirPath + "/" + file);
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
-			}
-		} else {
-			System.out.println("No Input Directory Specified!");
-		}
-
-		
-
-	}
-
-	private void makeNGrams(String s) {
 				
-				System.out.println(s);
+			} catch (Exception e) {
+				// TODO: handle exception
+				System.out.println("The folder location cannot be found, double check you specified path.");
+			}	
+		
+	
+	}
+	
+	/**
+	 * Make n-grams from each line of file
+	 * 
+	 * @param line - the line read from the file
+	 * @return void
+	 *
+	 */
+	private void makeNGrams(String line) {
+				
+				System.out.println(line);
 				
 				String x = null;
 				
-				char[] arr = s.toCharArray();
+				char[] arr = line.toCharArray();
 				
 				
 				// Array to make substring (n-gram size)
@@ -184,10 +201,11 @@ public class Parser {
 					// when i = 0, substring = i + size(2)
 					// when i = 2, substring = i + size(4)
 					// when i = 4, substring = i + size(6)
-					
 					if(arr.length > i+nGramSize) {
-						x = s.substring(i, nGramSize + i);
-						System.out.println(x);
+						x = line.substring(i, nGramSize + i);
+//						System.out.println(x);
+						// add to some storage array for processing
+						addNGram(x);
 					} else {
 						// how do i handle last piece of the line & the next line?
 						

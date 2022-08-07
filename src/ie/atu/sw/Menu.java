@@ -10,7 +10,11 @@ public class Menu {
 		s = new Scanner(System.in);
 	}
 
+	// Initialise Parser object
 	Parser p = new Parser() ;
+	
+	// Initialise Ouputter Object
+	Outputter o = new Outputter();
 
 	// Start Menu & Process User Choice
 	public void start() {
@@ -54,6 +58,18 @@ public class Menu {
 			} else if (choice == 3) {
 
 				System.out.println("Specify Output file name/type should be CSV");
+				
+				// reads an String value
+			    String outputName = s.next();
+			    
+			    if(outputName != null ) {
+			    	o.setOutputName(outputName);
+					System.out.print("Select Option [1-4]>");
+					System.out.println();
+			    } else {
+			    	System.out.println("Error");
+			    }				
+				
 
 			} else if (choice == 4) {
 
