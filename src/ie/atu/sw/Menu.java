@@ -63,7 +63,7 @@ public class Menu {
 			    String outputName = s.next();
 			    
 			    if(outputName != null ) {
-			    	o.setOutputName(outputName);
+			    	p.setOutputName(outputName);
 					System.out.print("Select Option [1-4]>");
 					System.out.println();
 			    } else {

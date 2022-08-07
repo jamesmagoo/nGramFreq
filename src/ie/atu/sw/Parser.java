@@ -1,6 +1,7 @@
 package ie.atu.sw;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -16,12 +17,16 @@ public class Parser {
 	private int nGramSize = 0;
 	// store the path to the directory for processing as set by user
 	private String inputDirPath = null;
+	// store the path to the directory for processing as set by user
+	private String outputName = "Results.txt";
 
 	public Parser() {
 		// TODO: Set this using the n-gram size (n) i.e. 26^n is the max amount of rows
 		// needed for an n-gram
 		freqTable = new Object[1000][2];
 	}
+	
+	
 	
 	/**
 	 * Execute the n-gram builder
@@ -35,7 +40,9 @@ public class Parser {
 		if((inputDirPath !=null) && (nGramSize != 0)) {
 			// process the directory
 			parseDirectory();
+			// Output results to file
 			printTable();
+			
 		} else {
 			System.out.println("ERROR: Specify N-Gram Size & Input/Output Directory Paths");
 		}
@@ -44,19 +51,28 @@ public class Parser {
 	}
 	
 	private void printTable() {
+		try (FileWriter fw = new FileWriter(new File(outputName)); 
+	            BufferedWriter bw = new BufferedWriter(fw)) {
+	        for (int i = 0; i < freqTable.length ; i++) {
+	        	// only print not null rows
+	        	if(freqTable[i][0] != null) {
+	        		bw.write(freqTable[i][0].toString());
+	        		bw.append(",");
+	        		bw.write(freqTable[i][1].toString());
+		            bw.newLine();
+	        	}
+	        }
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
 		
-		for(int i = 0; i < freqTable.length ; i++ ) {
-			if(freqTable[i][0] != null) {
-				System.out.println(freqTable[i][0] + "---" + freqTable[i][1]);
-			}
-		}
 	}
 
 	/**
 	 * Add the n-gram to the frequency table
 	 * 
 	 * @param nGram - the n-gram
-	 * @return vid
+	 * @return void
 	 *
 	 */
 	public void addNGram(String nGram) {
@@ -92,7 +108,7 @@ public class Parser {
 	}
 
 	/**
-	 * Read the files
+	 * Read the file
 	 * 
 	 * @param file , the file to be read
 	 * @return void
@@ -102,23 +118,21 @@ public class Parser {
 
 		// check that n-gram size and file location has been set
 
-		try {
-			//FileWriter fw = new FileWriter("out.txt");
-			
+		try {	
 			// BufferedReader processes files in directory 
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 			String line = null;
 			while ((line = br.readLine()) != null) {
 
-				// do some business here n-gramming
+				// remove spaces and other symbols as per instruction in Project forum
 				line = line.replaceAll("[^A-Za-z]", "").toLowerCase();
+				
+				// make n-grams from the line
 				makeNGrams(line);
-				// fw.write(line + " by Alex Turner zzz" + "\n");
 			}
 
 			br.close();
-//			fw.flush();
-//			fw.close();
+
 
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -147,6 +161,23 @@ public class Parser {
 		}
 
 	}
+	/**
+	 * Set the output file name
+	 * 
+	 * @param s - the file name
+	 * @return boolean
+	 *
+	 */
+	public boolean setOutputName(String s) {
+		
+		if(s != null) {
+			outputName  = s;
+			System.out.println("Output file name set to : " + outputName);
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	/**
 	 * Parse each file in the set directory for n-gram processing
@@ -162,8 +193,6 @@ public class Parser {
 				File f = new File(inputDirPath);
 				fileList = f.list();
 				for (String file : fileList) {
-					System.out.println(file);
-					// process each file 
 					try {
 						readFile(inputDirPath + "/" + file);
 					} catch (Exception e) {
