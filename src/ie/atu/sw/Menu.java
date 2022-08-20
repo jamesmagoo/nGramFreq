@@ -1,6 +1,5 @@
 package ie.atu.sw;
 import java.util.Scanner;
-import javax.swing.JFileChooser;
 
 public class Menu {
 
@@ -10,10 +9,10 @@ public class Menu {
 		s = new Scanner(System.in);
 	}
 
-	// Initialise Parser object
+	// Initialize Parser object
 	Parser p = new Parser() ;
 	
-	// Initialise Ouputter Object
+	// Initialize Outputter Object
 	Outputter o = new Outputter();
 
 	// Start Menu & Process User Choice
@@ -75,7 +74,11 @@ public class Menu {
 
 				try {
 					// main n-gram builder method
-					p.executeNGramBuilder();
+					if(p.executeNGramBuilder() ==true) {
+						System.out.println("Success, please see output file saved in folder.");
+					} else {
+						System.out.println("There was an error, please ensure all inputs were correct");
+					};
 					
 				} catch (Exception e) {
 				

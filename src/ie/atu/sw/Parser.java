@@ -23,7 +23,7 @@ public class Parser {
 	public Parser() {
 		// TODO: Set this using the n-gram size (n) i.e. 26^n is the max amount of rows
 		// needed for an n-gram
-		freqTable = new Object[1000][2];
+		freqTable = new Object[11881376][2];
 	}
 	
 	
@@ -35,16 +35,17 @@ public class Parser {
 	 * @return void TODO: Should return something for feedback????
 	 *
 	 */
-	public void executeNGramBuilder() {
+	public boolean executeNGramBuilder() {
 		// check that size, output path, and input directory path are all specified
 		if((inputDirPath !=null) && (nGramSize != 0)) {
 			// process the directory
 			parseDirectory();
 			// Output results to file
 			printTable();
-			
+			return true;
 		} else {
 			System.out.println("ERROR: Specify N-Gram Size & Input/Output Directory Paths");
+			return false;
 		}
 		
 		
@@ -183,7 +184,7 @@ public class Parser {
 	 * Parse each file in the set directory for n-gram processing
 	 * 
 	 * @param dirPath
-	 * @return boolean
+	 * @return void
 	 *
 	 */
 	public void parseDirectory() {
@@ -217,13 +218,10 @@ public class Parser {
 	 *
 	 */
 	private void makeNGrams(String line) {
-				
-				System.out.println(line);
-				
+						
 				String x = null;
 				
 				char[] arr = line.toCharArray();
-				
 				
 				// Array to make substring (n-gram size)
 				for(int i=0; i<arr.length ; i+=nGramSize) {
@@ -232,13 +230,10 @@ public class Parser {
 					// when i = 4, substring = i + size(6)
 					if(arr.length > i+nGramSize) {
 						x = line.substring(i, nGramSize + i);
-//						System.out.println(x);
+						
 						// add to some storage array for processing
 						addNGram(x);
-					} else {
-						// how do i handle last piece of the line & the next line?
-						
-					}
+					} 
 				}
 								
 			}
