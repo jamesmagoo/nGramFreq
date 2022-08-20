@@ -25,19 +25,17 @@ public class Parser {
 		// needed for an n-gram
 		freqTable = new Object[11881376][2];
 	}
-	
-	
-	
+
 	/**
 	 * Execute the n-gram builder
 	 * 
 	 * @param void
-	 * @return void TODO: Should return something for feedback????
+	 * @return boolean - to provide user feedback
 	 *
 	 */
 	public boolean executeNGramBuilder() {
 		// check that size, output path, and input directory path are all specified
-		if((inputDirPath !=null) && (nGramSize != 0)) {
+		if ((inputDirPath != null) && (nGramSize != 0)) {
 			// process the directory
 			parseDirectory();
 			// Output results to file
@@ -47,26 +45,24 @@ public class Parser {
 			System.out.println("ERROR: Specify N-Gram Size & Input/Output Directory Paths");
 			return false;
 		}
-		
-		
+
 	}
-	
+
 	private void printTable() {
-		try (FileWriter fw = new FileWriter(new File(outputName)); 
-	            BufferedWriter bw = new BufferedWriter(fw)) {
-	        for (int i = 0; i < freqTable.length ; i++) {
-	        	// only print not null rows
-	        	if(freqTable[i][0] != null) {
-	        		bw.write(freqTable[i][0].toString());
-	        		bw.append(",");
-	        		bw.write(freqTable[i][1].toString());
-		            bw.newLine();
-	        	}
-	        }
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
-		
+		try (FileWriter fw = new FileWriter(new File(outputName)); BufferedWriter bw = new BufferedWriter(fw)) {
+			for (int i = 0; i < freqTable.length; i++) {
+				// only print not null rows
+				if (freqTable[i][0] != null) {
+					bw.write(freqTable[i][0].toString());
+					bw.append(",");
+					bw.write(freqTable[i][1].toString());
+					bw.newLine();
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	/**
@@ -119,21 +115,20 @@ public class Parser {
 
 		// check that n-gram size and file location has been set
 
-		try {	
-			// BufferedReader processes files in directory 
+		try {
+			// BufferedReader processes files in directory
 			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 			String line = null;
 			while ((line = br.readLine()) != null) {
 
 				// remove spaces and other symbols as per instruction in Project forum
 				line = line.replaceAll("[^A-Za-z]", "").toLowerCase();
-				
+
 				// make n-grams from the line
 				makeNGrams(line);
 			}
 
 			br.close();
-
 
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -162,6 +157,7 @@ public class Parser {
 		}
 
 	}
+
 	/**
 	 * Set the output file name
 	 * 
@@ -170,9 +166,9 @@ public class Parser {
 	 *
 	 */
 	public boolean setOutputName(String s) {
-		
-		if(s != null) {
-			outputName  = s;
+
+		if (s != null) {
+			outputName = s;
 			System.out.println("Output file name set to : " + outputName);
 			return true;
 		} else {
@@ -189,27 +185,26 @@ public class Parser {
 	 */
 	public void parseDirectory() {
 		String[] fileList = null;
-		
-			try {
-				File f = new File(inputDirPath);
-				fileList = f.list();
-				for (String file : fileList) {
-					try {
-						readFile(inputDirPath + "/" + file);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+
+		try {
+			File f = new File(inputDirPath);
+			fileList = f.list();
+			for (String file : fileList) {
+				try {
+					readFile(inputDirPath + "/" + file);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				
-			} catch (Exception e) {
-				// TODO: handle exception
-				System.out.println("The folder location cannot be found, double check you specified path.");
-			}	
-		
-	
+			}
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println("The folder location cannot be found, double check you specified path.");
+		}
+
 	}
-	
+
 	/**
 	 * Make n-grams from each line of file
 	 * 
@@ -218,23 +213,49 @@ public class Parser {
 	 *
 	 */
 	private void makeNGrams(String line) {
-						
-				String x = null;
-				
-				char[] arr = line.toCharArray();
-				
-				// Array to make substring (n-gram size)
-				for(int i=0; i<arr.length ; i+=nGramSize) {
-					// when i = 0, substring = i + size(2)
-					// when i = 2, substring = i + size(4)
-					// when i = 4, substring = i + size(6)
-					if(arr.length > i+nGramSize) {
-						x = line.substring(i, nGramSize + i);
-						
-						// add to some storage array for processing
-						addNGram(x);
-					} 
+
+		// nGram variable to store nGrams
+		String nGram = null;
+		// the remainder is the portion at end of line missed by loop
+		String remainder = null;
+		// the fill is the number of underscores added to make the remainder on a line
+		// the same length as the n-gram
+		int fill = 0;
+
+		
+		// convert line (String) to char array to loop through and make n-grams
+		char[] arr = line.toCharArray();
+
+		// Array to make substring (n-gram size)
+		for (int i = 0; i < arr.length; i += nGramSize) {
+			// when i = 0, substring = i + size(2)
+			// when i = 2, substring = i + size(4)
+			// when i = 4, substring = i + size(6)
+			if (arr.length > i + nGramSize) {
+				nGram = line.substring(i, nGramSize + i);
+				// add full nGram to storage array for processing
+				addNGram(nGram);
+			} else {
+				// deal with remainder of line not parsed
+				remainder = line.substring(i, arr.length);
+				// check how much needs to be filled to make the n-gram size
+				fill = nGramSize - remainder.length();
+				if (fill == 1) {
+					// add underscore to make remainder same length as n-gram
+					addNGram(remainder + "_");
+				} else if (fill == 2) {
+					// add 2 underscores to make remainder same length as n-gram
+					addNGram(remainder + "__");
+				} else if (fill == 3) {
+					// add 3 underscores to make remainder same length as n-gram
+					addNGram(remainder + "___");
+				} else if (fill == 4) {
+					// add 4 underscores to make remainder same length as n-gram
+					addNGram(remainder + "____");
 				}
-								
+
 			}
+		}
+
 	}
+}
